@@ -4,8 +4,7 @@ import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import axios from "axios";
 import qs from "qs"
-import twilio from "twilio"
-import ngrok from 'ngrok'
+
 // import contact_model from "./src/model/contact.js";
 // Load environment variables from .env file
 dotenv.config();
