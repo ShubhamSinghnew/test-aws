@@ -39,7 +39,7 @@ app.get('/auth/zoho/callback', async (req, res) => {
         code: code,
         client_id: '1000.ZVKBEM29FTWQ28GY4YR8QXYODNT4NI',
         client_secret: '5fcad4f500f46a07e10e3b6c4cd925556958b42e6e',
-        redirect_uri: 'http://localhost:5000/auth/zoho/callback',
+        redirect_uri: 'https://test-aws-lz6a.onrender.com/auth/zoho/callback',
         grant_type: 'authorization_code',
       }),
       {
