@@ -123,7 +123,7 @@ app.get('/auth/zoho/callback', async (req, res) => {
 app.post('/from-cliq', (req, res) => {
   const { text, user } = req.body;
 
-  console.log(`Zoho User ${user.email} says: ${text}`);
+  console.log(`Zoho User ${text}, ${user}`);
 
   // You can now respond or forward this to WhatsApp
   res.status(200).send('OK');
