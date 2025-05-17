@@ -153,7 +153,7 @@ app.post('/from-cliq', (req, res) => {
     const message = await client.messages.create({
       body: msg,
       from: "whatsapp:+14155238886", // <-- Twilio Sandbox number
-      to: `whatsapp:+91${num}`,  // <-- Your verified number
+      to: `whatsapp:+919594892642`,  // <-- Your verified number
     });
 
   }
