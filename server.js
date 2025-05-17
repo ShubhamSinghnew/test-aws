@@ -145,8 +145,8 @@ app.post('/from-cliq', (req, res) => {
 
 
   // You can now respond or forward this to WhatsApp
-  const accountSid = process.env.TWILIO_ACCOUNT_SID;
-  const authToken = process.env.TWILIO_AUTH_TOKEN;
+  const accountSid = 'ACaf391f145ee7caf8a4a70ffa82386441;
+  const authToken = '0a43bcafae787ab2072dc1b412a0a482;
   const client = twilio(accountSid, authToken);
 
   async function createMessage() {
