@@ -122,26 +122,26 @@ app.get('/auth/zoho/callback', async (req, res) => {
 
 app.post('/from-cliq', (req, res) => {
 
-  function extractPhoneAndMessage(rawMessage) {
-    const match = rawMessage.trim().match(/^(\d{10})(.*)/);
-    if (!match) return null;
+  // function extractPhoneAndMessage(rawMessage) {
+  //   const match = rawMessage.trim().match(/^(\d{10})(.*)/);
+  //   if (!match) return null;
 
-    return {
-      phoneNumber: match[1],
-      messageText: match[2].trim(),
-    };
-  }
+  //   return {
+  //     phoneNumber: match[1],
+  //     messageText: match[2].trim(),
+  //   };
+  // }
 
 
-  const rawMessage = req.body.message || '';
-  const result = extractPhoneAndMessage(rawMessage);
+  // const rawMessage = req.body.message || '';
+  // const result = extractPhoneAndMessage(rawMessage);
 
-  if (!result) {
-    return res.status(400).send('Invalid message format. Expected 10-digit phone number at start.');
-  }
+  // if (!result) {
+  //   return res.status(400).send('Invalid message format. Expected 10-digit phone number at start.');
+  // }
 
-  const num =  result.phoneNumber;
-  const msg =  result.messageText;
+  // const num =  result.phoneNumber;
+  // const msg =  result.messageText;
 
 
   // You can now respond or forward this to WhatsApp
@@ -151,7 +151,7 @@ app.post('/from-cliq', (req, res) => {
 
   async function createMessage() {
     const message = await client.messages.create({
-      body: msg,
+      body: req.body.message,
       from: "whatsapp:+14155238886", // <-- Twilio Sandbox number
       to: `whatsapp:+919594892642`,  // <-- Your verified number
     });
