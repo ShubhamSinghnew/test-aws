@@ -143,14 +143,6 @@ app.post('/from-cliq', (req, res) => {
   // const num =  result.phoneNumber;
   // const msg =  result.messageText;
 
-  const payload = req.body;
-
-  // Get sender/user ID
-  const sender = payload[0]?.objString?.sender;
-
-  console.log('Sender ID:', sender);
-  console.log('Full Payload:', JSON.stringify(payload, null, 2));
-
   // You can now respond or forward this to WhatsApp
   const accountSid = 'ACaf391f145ee7caf8a4a70ffa82386441';
   const authToken = '1c8307e0c5d7f2279b9290c274594be1';
