@@ -121,28 +121,6 @@ app.get('/auth/zoho/callback', async (req, res) => {
 
 
 app.post('/from-cliq', (req, res) => {
-
-  // function extractPhoneAndMessage(rawMessage) {
-  //   const match = rawMessage.trim().match(/^(\d{10})(.*)/);
-  //   if (!match) return null;
-
-  //   return {
-  //     phoneNumber: match[1],
-  //     messageText: match[2].trim(),
-  //   };
-  // }
-
-
-  // const rawMessage = req.body.message || '';
-  // const result = extractPhoneAndMessage(rawMessage);
-
-  // if (!result) {
-  //   return res.status(400).send('Invalid message format. Expected 10-digit phone number at start.');
-  // }
-
-  // const num =  result.phoneNumber;
-  // const msg =  result.messageText;
-
   // You can now respond or forward this to WhatsApp
   const accountSid = 'ACaf391f145ee7caf8a4a70ffa82386441';
   const authToken = '1c8307e0c5d7f2279b9290c274594be1';
