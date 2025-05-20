@@ -209,7 +209,7 @@ app.post('/to_cliq', async (req, res) => {
       },
       {
         headers: {
-          'Authorization': 'Bearer 1000.b3720b82b45acab2ddc84477ba93735d.8064551b529c1e9cbe33086f362a41ff',
+          'Authorization': 'Bearer 1000.8c99c4ce61bb8ccfe9f9ba773ec82a12.f5eb804a97bcc14efe9e168e37145921',
           'Content-Type': 'application/json'
         }
       }
