@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import axios from "axios";
 import qs from "qs"
 import twilio from "twilio";
+import fs from "fs"
 // import contact_model from "./src/model/contact.js";
 // Load environment variables from .env file
 dotenv.config();
@@ -55,21 +56,7 @@ app.get('/auth/zoho/callback', async (req, res) => {
     console.log('Access Token:', response.data);
 
 
-    // const accountSid = process.env.TWILIO_ACCOUNT_SID;
-    // const authToken = process.env.TWILIO_AUTH_TOKEN;
-    // const client = twilio(accountSid, authToken);
 
-    // async function createMessage() {
-    //   const message = await client.messages.create({
-    //     body: "Hello there!",
-    //     from: "whatsapp:+14155238886", // <-- Twilio Sandbox number
-    //     to: "whatsapp:+918169016586",  // <-- Your verified number
-    //   });
-
-    //   console.log(message.body);
-    // }
-
-    // createMessage();
     res.send('Zoho authorization complete. Tokens received.');
   } catch (err) {
     console.error('Error:', err.response?.data || err.message);
@@ -120,22 +107,102 @@ app.get('/auth/zoho/callback', async (req, res) => {
 // 5fcad4f500f46a07e10e3b6c4cd925556958b42e6e
 
 
-app.post('/from-cliq', (req, res) => {
-  // You can now respond or forward this to WhatsApp
-  const accountSid = 'ACaf391f145ee7caf8a4a70ffa82386441';
-  const authToken = 'ae4054fad26c141ded0b03a0c8c33fb3';
-  const client = twilio(accountSid, authToken);
+app.post('/from-cliq', async (req, res) => {
+  try {
+    const check_receiver = req.body.user;
+    const messageText = req.body.message;
 
-  async function createMessage() {
-    const message = await client.messages.create({
-      body: req.body.message,
-      from: "whatsapp:+14155238886", // <-- Twilio Sandbox number
-      to: `whatsapp:+919594892642`,  // <-- Your verified number
-    });
+    // Read user.json
+    const find_user = JSON.parse(fs.readFileSync("user.json", { encoding: 'utf-8' }));
 
+    // Find matching user data
+    const matchedUser = find_user.find(ele => ele.user_id !== null && ele.user_id === check_receiver);
+
+    if (!matchedUser) {
+      return res.status(404).send('User not found');
+    }
+
+    // Prepare WhatsApp API call parameters
+    const whatsappAccessToken = 'EAAI2Ossi3PIBOz75F5Qa5T6oYZCHvTFcZA1nspItiIH6LfDe5AhR9kblkpkzZAfzOVOVRCkV9q5gmXDKSXNP5KhzsySyF0ODZBvKYvkY6U8OMTYeZBKuqPI4J41cYxISdSXuDIWFM5AqgemnSf53nvjQLPuphl1V3c7Mmc4aZCa1fX73WUienykmD1ahJkypM5TFFKBlpuPWXLsKKyQEZBEZCsMgpdQEL8VQBKVM0ZB8ZD';  // Replace with your actual token
+    const phoneNumberId = '578737805333309';          // From your Facebook WhatsApp Business account
+
+    // Prepare payload for WhatsApp Cloud API (template message example)
+    const payload = {
+      messaging_product: "whatsapp",
+      to: matchedUser.recipient_no, // e.g., "919876543210"
+      type: "template",
+      template: {
+        name: "whatsapp_testing", // updated to match the template name from the image
+        language: {
+          code: "en"
+        },
+        components: [
+          {
+            type: "body",
+            parameters: [
+              {
+                type: "text",
+                text: messageText // replace 'apiMessage' with the actual variable or string containing your API message
+              }
+            ]
+          }
+        ]
+      }
+    };
+
+
+    // Call WhatsApp Cloud API to send message
+    const response = await axios.post(
+      `https://graph.facebook.com/v22.0/${phoneNumberId}/messages`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${whatsappAccessToken}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    console.log('WhatsApp message sent:', response.data);
+
+    res.status(200).send('Message forwarded to WhatsApp.');
+
+  } catch (error) {
+    console.error('Error sending WhatsApp message:', error.response?.data || error.message);
+    res.status(500).send('Failed to send message.');
   }
-
-  createMessage();
-  res.status(200).send('OK');
 });
 
+
+app.post('/to_cliq', async (req, res) => {
+  const data = req.body;
+
+  try {
+    const response = await axios.post(
+      'https://cliq.zoho.in/api/v2/bots/test/message',
+      {
+        text: data.message,
+        userids: "60039859115",
+        sync_message: true
+      },
+      {
+        headers: {
+          'Authorization': 'Bearer 1000.1de5995072c9cbddf9a1e4967e161391.c55d12c0564321f3d17303a4bb7b323d',
+          'Content-Type': 'application/json',
+          'Cookie': 'CT_CSRF_TOKEN=3c5c11ec-b3d2-4a65-aa7b-b08ea85a8118; _zcsr_tmp=3c5c11ec-b3d2-4a65-aa7b-b08ea85a8118; zalb_9ca8afda3c=961d7a13b91771a5c0f36f410fee18b5'
+        }
+      }
+    );
+
+    res.status(200).json({
+      message: 'Message sent to Zoho Cliq',
+      data: response.data
+    });
+  } catch (error) {
+    console.error('Error sending message to Zoho Cliq:', error.response?.data || error.message);
+    res.status(500).json({
+      message: 'Failed to send message',
+      error: error.response?.data || error.message
+    });
+  }
+});
