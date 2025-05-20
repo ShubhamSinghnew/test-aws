@@ -123,7 +123,7 @@ app.post('/from-cliq', async (req, res) => {
     }
 
     // Prepare WhatsApp API call parameters
-    const whatsappAccessToken = 'EAAI2Ossi3PIBOz75F5Qa5T6oYZCHvTFcZA1nspItiIH6LfDe5AhR9kblkpkzZAfzOVOVRCkV9q5gmXDKSXNP5KhzsySyF0ODZBvKYvkY6U8OMTYeZBKuqPI4J41cYxISdSXuDIWFM5AqgemnSf53nvjQLPuphl1V3c7Mmc4aZCa1fX73WUienykmD1ahJkypM5TFFKBlpuPWXLsKKyQEZBEZCsMgpdQEL8VQBKVM0ZB8ZD';  // Replace with your actual token
+    const whatsappAccessToken = 'EAAI2Ossi3PIBO0c7TMFF60KMXGTZAjiAZBLlmkSXQ1zZCYYLUIhvfoDaWkfhEtDJh1zuyJFRZAgsxFu8bHHOYH4fJzU1X7ySqGgZA8C9bgp71ZBI6ZCZBw8FD3ehjzMZBnz7M44iBWjZCK5IQovzwLZAm2a03ZBeZA1F5tZBCpnOkfMPPinOqLv55ZCKBR8xe55RzUHTeGN8X4ZBbTsKWV7aYHzA6P1ZAEauF3J3U4GNwihNkYOwZD';  // Replace with your actual token
     const phoneNumberId = '578737805333309';          // From your Facebook WhatsApp Business account
 
     // Prepare payload for WhatsApp Cloud API (template message example)
