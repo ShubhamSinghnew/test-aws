@@ -24,45 +24,84 @@ app.listen(port, () => {
 });
 // export default io;
 
+const getZohoAccessToken = async () => {
+  const tokenData = JSON.parse(fs.readFileSync("zoho_token.json", 'utf-8'));
+  const now = Date.now();
 
-app.get('/auth/zoho/callback', async (req, res) => {
-  const { code } = req.query;
-  console.log('code: ', code)
-
-  if (!code) {
-    return res.status(400).send('Missing code');
+  // Token still valid
+  if (tokenData.expires_at > now) {
+    return tokenData.access_token;
   }
 
   try {
+    const params = new URLSearchParams();
+    params.append('refresh_token', tokenData.refresh_token);
+    params.append('client_id', process.env.CLIENT_ID);
+    params.append('client_secret', process.env.CLIENT_SECRET);
+    params.append('grant_type', 'refresh_token');
+
     const response = await axios.post(
       'https://accounts.zoho.in/oauth/v2/token',
-      qs.stringify({
-        code: code,
-        client_id: '1000.ZVKBEM29FTWQ28GY4YR8QXYODNT4NI',
-        client_secret: '5fcad4f500f46a07e10e3b6c4cd925556958b42e6e',
-        redirect_uri: 'https://test-aws-lz6a.onrender.com/auth/zoho/callback',
-        grant_type: 'authorization_code',
-      }),
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      }
+      params
     );
 
-    const accessToken = response.data.access_token;
-    const refreshToken = response.data.refresh_token;
+    const newAccessToken = response.data.access_token;
+    const expiresIn = response.data.expires_in; // in seconds
 
-    console.log('Access Token:', response.data);
+    // Update token file
+    const updatedToken = {
+      ...tokenData,
+      access_token: newAccessToken,
+      expires_at: now + (expiresIn * 1000)
+    };
 
+    fs.writeFileSync('zoho_token.json', JSON.stringify(updatedToken, null, 2));
 
-
-    res.send('Zoho authorization complete. Tokens received.');
-  } catch (err) {
-    console.error('Error:', err.response?.data || err.message);
-    res.status(500).send('Token exchange failed');
+    return newAccessToken;
+  } catch (error) {
+    console.error('Failed to refresh Zoho token:', error.response?.data || error.message);
+    throw new Error('Zoho token refresh failed');
   }
-});
+};
+
+// app.get('/auth/zoho/callback', async (req, res) => {
+//   const { code } = req.query;
+//   console.log('code: ', code)
+
+//   if (!code) {
+//     return res.status(400).send('Missing code');
+//   }
+
+//   try {
+//     const response = await axios.post(
+//       'https://accounts.zoho.in/oauth/v2/token',
+//       qs.stringify({
+//         code: code,
+//         client_id: '1000.ZVKBEM29FTWQ28GY4YR8QXYODNT4NI',
+//         client_secret: '5fcad4f500f46a07e10e3b6c4cd925556958b42e6e',
+//         redirect_uri: 'https://test-aws-lz6a.onrender.com/auth/zoho/callback',
+//         grant_type: 'authorization_code',
+//       }),
+//       {
+//         headers: {
+//           'Content-Type': 'application/x-www-form-urlencoded',
+//         },
+//       }
+//     );
+
+//     const accessToken = response.data.access_token;
+//     const refreshToken = response.data.refresh_token;
+
+//     console.log('Access Token:', response.data);
+
+
+
+//     res.send('Zoho authorization complete. Tokens received.');
+//   } catch (err) {
+//     console.error('Error:', err.response?.data || err.message);
+//     res.status(500).send('Token exchange failed');
+//   }
+// });
 
 // app.post('/send_sms', async (req, res) => {
 //   try {
@@ -123,8 +162,15 @@ app.post('/from-cliq', async (req, res) => {
     }
 
     // Prepare WhatsApp API call parameters
-    const whatsappAccessToken = 'EAAI2Ossi3PIBO0c7TMFF60KMXGTZAjiAZBLlmkSXQ1zZCYYLUIhvfoDaWkfhEtDJh1zuyJFRZAgsxFu8bHHOYH4fJzU1X7ySqGgZA8C9bgp71ZBI6ZCZBw8FD3ehjzMZBnz7M44iBWjZCK5IQovzwLZAm2a03ZBeZA1F5tZBCpnOkfMPPinOqLv55ZCKBR8xe55RzUHTeGN8X4ZBbTsKWV7aYHzA6P1ZAEauF3J3U4GNwihNkYOwZD';  // Replace with your actual token
-    const phoneNumberId = '578737805333309';          // From your Facebook WhatsApp Business account
+    const whatsappTokenData = JSON.parse(fs.readFileSync("whatsapp_token.json", "utf-8"));
+    const now = Date.now();
+
+    if (now > whatsappTokenData.expires_at) {
+      return res.status(401).send("WhatsApp access token expired. Please update it.");
+    }
+
+    const whatsappAccessToken = whatsappTokenData.access_token;
+    const phoneNumberId = '578737805333309';
 
     // Prepare payload for WhatsApp Cloud API (template message example)
     const payload = {
@@ -178,8 +224,7 @@ app.get('/to_cliq', (req, res) => {
   const token = req.query['hub.verify_token'];
   const challenge = req.query['hub.challenge'];
 
-   if (mode === 'subscribe' && token === 'xfcgvhbjnkm,fopdociwqj') {
-    console.log('WEBHOOK_VERIFIED');
+  if (mode === 'subscribe' && token === process.env.verify_token) {
     res.status(200).send(challenge);
   } else {
     res.sendStatus(403);
@@ -187,7 +232,6 @@ app.get('/to_cliq', (req, res) => {
 });
 
 app.post('/to_cliq', async (req, res) => {
-  console.log(req.body)
   const entry = req.body.entry?.[0];
   const changes = entry?.changes?.[0];
   const messages = changes?.value?.messages;
@@ -200,17 +244,29 @@ app.post('/to_cliq', async (req, res) => {
   const text = msg.text?.body;
   const from = msg.from;
 
+  // Read user.json
+  const find_user = JSON.parse(fs.readFileSync("user.json", { encoding: 'utf-8' }));
+
+  // Find matching user data
+  const matchedUser = find_user.find(ele => ele.recipient_no !== null && ele.recipient_no === from);
+
+  if (!matchedUser) {
+    return res.status(404).send('User not found');
+  }
+
   try {
+    const accessToken = await getZohoAccessToken();
+
     const response = await axios.post(
       'https://cliq.zoho.in/api/v2/bots/test/message',
       {
         text: `WhatsApp message from ${from}: ${text}`,
-        userids: "60039859115",
+        userids: matchedUser.user_id,
         sync_message: true
       },
       {
         headers: {
-          'Authorization': 'Bearer 1000.8c99c4ce61bb8ccfe9f9ba773ec82a12.f5eb804a97bcc14efe9e168e37145921',
+          'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json'
         }
       }
@@ -228,6 +284,3 @@ app.post('/to_cliq', async (req, res) => {
     });
   }
 });
-
-
-// xfcgvhbjnkm,fopdociwqj
