@@ -173,23 +173,44 @@ app.post('/from-cliq', async (req, res) => {
   }
 });
 
+app.get('/to_cliq', (req, res) => {
+  const mode = req.query['hub.mode'];
+  const token = req.query['hub.verify_token'];
+  const challenge = req.query['hub.challenge'];
+
+  if (mode === 'subscribe' && token === VERIFY_TOKEN) {
+    console.log('WEBHOOK_VERIFIED');
+    res.status(200).send(challenge);
+  } else {
+    res.sendStatus(403);
+  }
+});
 
 app.post('/to_cliq', async (req, res) => {
-  const data = req.body;
+  const entry = req.body.entry?.[0];
+  const changes = entry?.changes?.[0];
+  const messages = changes?.value?.messages;
+
+  if (!messages || messages.length === 0) {
+    return res.sendStatus(200); // No message to process
+  }
+
+  const msg = messages[0];
+  const text = msg.text?.body;
+  const from = msg.from;
 
   try {
     const response = await axios.post(
       'https://cliq.zoho.in/api/v2/bots/test/message',
       {
-        text: data.message,
+        text: `WhatsApp message from ${from}: ${text}`,
         userids: "60039859115",
         sync_message: true
       },
       {
         headers: {
-          'Authorization': 'Bearer 1000.1de5995072c9cbddf9a1e4967e161391.c55d12c0564321f3d17303a4bb7b323d',
-          'Content-Type': 'application/json',
-          'Cookie': 'CT_CSRF_TOKEN=3c5c11ec-b3d2-4a65-aa7b-b08ea85a8118; _zcsr_tmp=3c5c11ec-b3d2-4a65-aa7b-b08ea85a8118; zalb_9ca8afda3c=961d7a13b91771a5c0f36f410fee18b5'
+          'Authorization': 'Bearer 1000.b3720b82b45acab2ddc84477ba93735d.8064551b529c1e9cbe33086f362a41ff',
+          'Content-Type': 'application/json'
         }
       }
     );
@@ -206,3 +227,6 @@ app.post('/to_cliq', async (req, res) => {
     });
   }
 });
+
+
+// xfcgvhbjnkm,fopdociwqj
