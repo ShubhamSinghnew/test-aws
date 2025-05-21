@@ -232,7 +232,7 @@ app.get('/to_cliq', (req, res) => {
 });
 
 app.post('/to_cliq', async (req, res) => {
-  console.log(JOSN.stringify(req.body))
+  console.log(JSON.stringify(req.body))
   const entry = req.body.entry?.[0];
   const changes = entry?.changes?.[0];
   const messages = changes?.value?.messages;
