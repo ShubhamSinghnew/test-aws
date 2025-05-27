@@ -227,6 +227,7 @@ app.get('/auth/zoho/callback', async (req, res) => {
 app.post('/from-cliq', async (req, res) => {
   try {
     const check_receiver = req.body.user;
+    const messageText = req.bosy.message;
 
     // Read user.json
     const find_user = JSON.parse(fs.readFileSync("user.json", "utf-8"));
@@ -249,38 +250,12 @@ app.post('/from-cliq', async (req, res) => {
     let template = "whatsapp_txt";  // Always use the image+text template
     const components = [];
 
-    // Optional image
-    const imageUrl = req.body?.file?.file?.url;
-    const comment = req.body?.file?.comment;
-    const messageText = req.body?.message;
+    if (req.body?.file?.file?.url) {
+      const imageUrl = req.body.file.file.url;
+      const comment = req.body.file.comment; // Optional comment added with image
 
-    // Case 1: Image + Comment
-    if (imageUrl) {
-      if (comment) {
-        template = "whatsapp_test";
-        components.push({
-          type: "header",
-          parameters: [
-            {
-              type: "image",
-              image: { link: imageUrl }
-            }
-          ]
-        });
-        components.push({
-          type: "body",
-          parameters: [
-            {
-              type: "text",
-              text: comment
-            }
-          ]
-        });
-      }
+      template = "whatsapp_test"; // Template with image header + 1 body variable
 
-      // Case 2: Only Image
-    } else if (imageUrl) {
-      template = "whatsapp_test";
       components.push({
         type: "header",
         parameters: [
@@ -291,9 +266,19 @@ app.post('/from-cliq', async (req, res) => {
         ]
       });
 
-      // Case 3: Only Text
+      components.push({
+        type: "body",
+        parameters: [
+          {
+            type: "text",
+            text: comment || " "  // Required body variable — fallback to space if empty
+          }
+        ]
+      });
+
     } else if (messageText) {
-      template = "whatsapp_txt";
+      template = "whatsapp_txt"; // Template with only body text
+
       components.push({
         type: "body",
         parameters: [
@@ -304,7 +289,10 @@ app.post('/from-cliq', async (req, res) => {
         ]
       });
 
+    } else {
+      return res.status(400).send("No valid message or media to send.");
     }
+
 
     const payload = {
       messaging_product: "whatsapp",
