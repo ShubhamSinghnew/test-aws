@@ -229,7 +229,6 @@ app.post('/from-cliq', async (req, res) => {
     const check_receiver = req.body.user;
     const messageText = req.body.message || " ";  // Fallback to ensure body param is sent
 
-    console.log(req.body)
 
     // Read user.json
     const find_user = JSON.parse(fs.readFileSync("user.json", "utf-8"));
@@ -264,15 +263,6 @@ app.post('/from-cliq', async (req, res) => {
               image: {
                 link: req.body.file.file.url
               }
-            }
-          ]
-        },
-        {
-          type: "body",
-          parameters: [
-            {
-              type: "text",
-              text: req.body?.file?.comment || ""  // This fills {{1}} in body
             }
           ]
         }
