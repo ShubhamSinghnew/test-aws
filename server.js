@@ -247,7 +247,7 @@ app.post('/from-cliq', async (req, res) => {
     const whatsappAccessToken = whatsappTokenData.access_token;
     const phoneNumberId = '578737805333309';
 
-    const template = "whatsapp_txt";  // Always use the image+text template
+    let template = "whatsapp_txt";  // Always use the image+text template
     const components = [];
 
     // Optional image
