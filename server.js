@@ -252,7 +252,7 @@ app.post('/from-cliq', async (req, res) => {
     const components = [];
 
     // Optional image
-    if (req.body?.file?.file?.url && req.body.message) {
+    if (req.body?.file?.file?.url) {
       template = "whatsapp_test";  // Template must have 1 image header + 1 body variable
       components.push(
         {
@@ -271,7 +271,7 @@ app.post('/from-cliq', async (req, res) => {
           parameters: [
             {
               type: "text",
-              text: req.body.message  // This fills {{1}} in body
+              text: req.body?.file?.file?.comment || ""  // This fills {{1}} in body
             }
           ]
         }
