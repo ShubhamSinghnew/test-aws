@@ -107,10 +107,20 @@ app.post('/from-cliq', async (req, res) => {
   try {
     const check_receiver = req.body.user;
     const messageText = req.body.message;
-    const file = req.body.file.file.url || "";
-  
-
     let template = ""
+    const components = [];
+
+    if (req.body.file.file.url) {
+        template = "whatsapp_test"
+        components.push({
+          type: "header",
+          parameters: [{
+            type: "image",
+            image: { link: req.body.file.file.url }
+          }]
+        });
+    }
+
 
     // Read user.json
     const find_user = JSON.parse(fs.readFileSync("user.json", { encoding: 'utf-8' }));
@@ -167,19 +177,7 @@ app.post('/from-cliq', async (req, res) => {
     //     ]
     //   }
     // };
-    const components = [];
-
-    if (file) {
-      template = "whatsapp_test"
-      components.push({
-        type: "header",
-        parameters: [{
-          type: "image",
-          image: { link: file }
-        }]
-      });
-    }
-
+    
     if (messageText) {
       template = "whatsapp_txt"
       components.push({
