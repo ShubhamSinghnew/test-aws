@@ -103,46 +103,12 @@ app.get('/auth/zoho/callback', async (req, res) => {
   }
 });
 
-// app.post('/send_sms', async (req, res) => {
-//   try {
-//     const response = await axios.post(
-//       'https://cliq.zoho.in/api/v2/buddies/dharm_v@gkexport.com/message',
-//       {
-//         text: "hello dharm bhai aap free ho abhi"
-//       },
-//       {
-//         headers: {
-//           Authorization: 'Bearer 1000.3b22719686784657d87bff47a6f71e77.4ca5b5c51dbf90f8e647c091ade9b149',
-//           'Content-Type': 'application/json',
-//           // You can skip the cookies unless needed for session management
-//           // Or use them only if required by the API
-//         }
-//       }
-//     );
-
-//     res.json({
-//       message: 'Message sent successfully!',
-//       data: response.data
-//     });
-
-//   } catch (error) {
-//     console.error('Error sending message:', error.response?.data || error.message);
-//     res.status(500).json({
-//       message: 'Failed to send message',
-//       error: error.response?.data || error.message
-//     });
-//   }
-// });
-
-
 app.post('/from-cliq', async (req, res) => {
   try {
     const check_receiver = req.body.user;
     const messageText = req.body.message;
     const file = req.body.file.file.url;
-
-    console.log(file);
-    
+  
     // Read user.json
     const find_user = JSON.parse(fs.readFileSync("user.json", { encoding: 'utf-8' }));
 
@@ -167,20 +133,31 @@ app.post('/from-cliq', async (req, res) => {
     // Prepare payload for WhatsApp Cloud API (template message example)
     const payload = {
       messaging_product: "whatsapp",
-      to: matchedUser.recipient_no, // e.g., "919876543210"
+      to: matchedUser.recipient_no,
       type: "template",
       template: {
-        name: "whatsapp_testing", // updated to match the template name from the image
+        name: "whatsapp_testing", // Must match your media-template name
         language: {
           code: "en"
         },
         components: [
           {
+            type: "header", // Media header
+            parameters: [
+              {
+                type: "image",
+                image: {
+                  link: file // Publicly accessible image URL
+                }
+              }
+            ]
+          },
+          {
             type: "body",
             parameters: [
               {
                 type: "text",
-                text: messageText // replace 'apiMessage' with the actual variable or string containing your API message
+                text: messageText
               }
             ]
           }
