@@ -139,8 +139,7 @@ app.post('/from-cliq', async (req, res) => {
   try {
     const check_receiver = req.body.user;
     const messageText = req.body.message;
-    const file = req.body.d
-    console.log(file)
+    console.log(req.body)
 
     // Read user.json
     const find_user = JSON.parse(fs.readFileSync("user.json", { encoding: 'utf-8' }));
