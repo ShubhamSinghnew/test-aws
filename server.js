@@ -110,7 +110,7 @@ app.post('/from-cliq', async (req, res) => {
     let template = ""
     const components = [];
 
-    if (req.body.file.file.url) {
+    if (req.body.file.file.url !== undefined) {
         template = "whatsapp_test"
         components.push({
           type: "header",
