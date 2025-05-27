@@ -136,7 +136,7 @@ app.post('/from-cliq', async (req, res) => {
       to: matchedUser.recipient_no,
       type: "template",
       template: {
-        name: "whatsapp_testing", // Must match your media-template name
+        name: "whatsapp_test", // Must match your media-template name
         language: {
           code: "en"
         },
