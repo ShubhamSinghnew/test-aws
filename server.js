@@ -271,7 +271,7 @@ app.post('/from-cliq', async (req, res) => {
           parameters: [
             {
               type: "text",
-              text: req.body?.file?.file?.comment || ""  // This fills {{1}} in body
+              text: req.body?.file?.comment || ""  // This fills {{1}} in body
             }
           ]
         }
