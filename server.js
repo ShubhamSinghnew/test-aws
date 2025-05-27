@@ -227,7 +227,7 @@ app.get('/auth/zoho/callback', async (req, res) => {
 app.post('/from-cliq', async (req, res) => {
   try {
     const check_receiver = req.body.user;
-    const messageText = req.bosy.message;
+    const messageText = req.body.message;
 
     // Read user.json
     const find_user = JSON.parse(fs.readFileSync("user.json", "utf-8"));
