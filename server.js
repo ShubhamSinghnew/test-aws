@@ -227,8 +227,6 @@ app.get('/auth/zoho/callback', async (req, res) => {
 app.post('/from-cliq', async (req, res) => {
   try {
     const check_receiver = req.body.user;
-    const messageText = req.body.message || " ";  // Fallback to ensure body param is sent
-
 
     // Read user.json
     const find_user = JSON.parse(fs.readFileSync("user.json", "utf-8"));
@@ -252,31 +250,61 @@ app.post('/from-cliq', async (req, res) => {
     const components = [];
 
     // Optional image
-    if (req.body?.file?.file?.url) {
-      template = "whatsapp_test";  // Template must have 1 image header + 1 body variable
-      components.push(
-        {
+    const imageUrl = req.body?.file?.file?.url;
+    const comment = req.body?.file?.comment;
+    const messageText = req.body?.message;
+
+    // Case 1: Image + Comment
+    if (imageUrl) {
+      if (comment) {
+        template = "whatsapp_test";
+        components.push({
           type: "header",
           parameters: [
             {
               type: "image",
-              image: {
-                link: req.body.file.file.url
-              }
+              image: { link: imageUrl }
             }
           ]
-        }
-      );
-    }
+        });
+        components.push({
+          type: "body",
+          parameters: [
+            {
+              type: "text",
+              text: comment
+            }
+          ]
+        });
+      }
 
-    // Required body
-    components.push({
-      type: "body",
-      parameters: [{
-        type: "text",
-        text: messageText
-      }]
-    });
+      // Case 2: Only Image
+    } else if (imageUrl) {
+      template = "whatsapp_test";
+      components.push({
+        type: "header",
+        parameters: [
+          {
+            type: "image",
+            image: { link: imageUrl }
+          }
+        ]
+      });
+
+      // Case 3: Only Text
+    } else if (messageText) {
+      template = "whatsapp_txt";
+      components.push({
+        type: "body",
+        parameters: [
+          {
+            type: "text",
+            text: messageText
+          }
+        ]
+      });
+
+    }
 
     const payload = {
       messaging_product: "whatsapp",
