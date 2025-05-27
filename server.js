@@ -107,19 +107,9 @@ app.post('/from-cliq', async (req, res) => {
   try {
     const check_receiver = req.body.user;
     const messageText = req.body.message;
+    const file = req.body?.file?.file?.url;
     let template = ""
-    const components = [];
-    if (req.body?.file?.file?.url) {
-        template = "whatsapp_test"
-        components.push({
-          type: "header",
-          parameters: [{
-            type: "image",
-            image: { link: req.body.file.file.url }
-          }]
-        });
-    }
-
+    
 
     // Read user.json
     const find_user = JSON.parse(fs.readFileSync("user.json", { encoding: 'utf-8' }));
@@ -143,61 +133,74 @@ app.post('/from-cliq', async (req, res) => {
     const phoneNumberId = '578737805333309';
 
     // Prepare payload for WhatsApp Cloud API (template message example)
-    // const payload = {
-    //   messaging_product: "whatsapp",
-    //   to: matchedUser.recipient_no,
-    //   type: "template",
-    //   template: {
-    //     name: "whatsapp_test", // Must match your media-template name
-    //     language: {
-    //       code: "en"
-    //     },
-    //     components: [
-    //       {
-    //         type: "header", // Media header
-    //         parameters: [
-    //           {
-    //             type: "image",
-    //             image: {
-    //               link: file // Publicly accessible image URL
-    //             }
-    //           }
-    //         ]
-    //       },
-    //       {
-    //         type: "body",
-    //         parameters: [
-    //           {
-    //             type: "text",
-    //             text: messageText
-    //           }
-    //         ]
-    //       }
-    //     ]
-    //   }
-    // };
-    
-    if (messageText) {
-      template = "whatsapp_txt"
-      components.push({
-        type: "body",
-        parameters: [{
-          type: "text",
-          text: messageText
-        }]
-      });
-    }
-
     const payload = {
       messaging_product: "whatsapp",
       to: matchedUser.recipient_no,
       type: "template",
       template: {
-        name: template,
-        language: { code: "en" },
-        components
+        name: "whatsapp_test", // Must match your media-template name
+        language: {
+          code: "en"
+        },
+        components: [
+          {
+            type: "header", // Media header
+            parameters: [
+              {
+                type: "image",
+                image: {
+                  link: file // Publicly accessible image URL
+                }
+              }
+            ]
+          },
+          {
+            type: "body",
+            parameters: [
+              {
+                type: "text",
+                text: messageText || ""
+              }
+            ]
+          }
+        ]
       }
     };
+    
+    // const components = [];
+
+    // if (req.body?.file?.file?.url) {
+    //     template = "whatsapp_test"
+    //     components.push({
+    //       type: "header",
+    //       parameters: [{
+    //         type: "image",
+    //         image: { link: req.body.file.file.url }
+    //       }]
+    //     });
+    // }
+    
+    // if (messageText) {
+    //   template = "whatsapp_txt"
+    //   components.push({
+    //     type: "body",
+    //     parameters: [{
+    //       type: "text",
+    //       text: messageText
+    //     }]
+    //   });
+    // }
+
+    // const payload = {
+    //   messaging_product: "whatsapp",
+    //   to: matchedUser.recipient_no,
+    //   type: "template",
+    //   template: {
+    //     name: template,
+    //     language: { code: "en" },
+    //     components
+    //   }
+    // };
 
     // Call WhatsApp Cloud API to send message
     const response = await axios.post(
