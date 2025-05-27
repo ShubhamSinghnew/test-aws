@@ -108,7 +108,7 @@ app.get('/auth/zoho/callback', async (req, res) => {
 //     const check_receiver = req.body.user;
 //     const messageText = req.body.message;
 //     let template = ""
-    
+
 
 
 //     // Read user.json
@@ -166,7 +166,7 @@ app.get('/auth/zoho/callback', async (req, res) => {
 //     //     ]
 //     //   }
 //     // };
-    
+
 //     const components = [];
 
 //     if (req.body?.file?.file?.url) {
@@ -179,7 +179,7 @@ app.get('/auth/zoho/callback', async (req, res) => {
 //           }]
 //         });
 //     }
-    
+
 //     if (messageText) {
 //       template = "whatsapp_txt"
 //       components.push({
@@ -229,6 +229,7 @@ app.post('/from-cliq', async (req, res) => {
     const check_receiver = req.body.user;
     const messageText = req.body.message || " ";  // Fallback to ensure body param is sent
 
+
     // Read user.json
     const find_user = JSON.parse(fs.readFileSync("user.json", "utf-8"));
     const matchedUser = find_user.find(ele => ele.user_id && ele.user_id === check_receiver);
@@ -251,17 +252,30 @@ app.post('/from-cliq', async (req, res) => {
     const components = [];
 
     // Optional image
-    if (req.body?.file?.file?.url) {
-      template = "whatsapp_test"
-      components.push({
-        type: "header",
-        parameters: [{
-          type: "image",
-          image: {
-            link: req.body.file.file.url
-          }
-        }]
-      });
+    if (req.body?.file?.file?.url && req.body.message) {
+      template = "whatsapp_test";  // Template must have 1 image header + 1 body variable
+      components.push(
+        {
+          type: "header",
+          parameters: [
+            {
+              type: "image",
+              image: {
+                link: req.body.file.file.url
+              }
+            }
+          ]
+        },
+        {
+          type: "body",
+          parameters: [
+            {
+              type: "text",
+              text: req.body.message  // This fills {{1}} in body
+            }
+          ]
+        }
+      );
     }
 
     // Required body
