@@ -6,6 +6,11 @@ import axios from "axios";
 import qs from "qs"
 import twilio from "twilio";
 import fs from "fs"
+import path from "path"
+import { v4 as uuidv4 } from 'uuid';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 // import contact_model from "./src/model/contact.js";
 // Load environment variables from .env file
 dotenv.config();
@@ -334,6 +339,8 @@ app.get('/to_cliq', (req, res) => {
   }
 });
 
+app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
+
 app.post('/to_cliq', async (req, res) => {
   const entry = req.body.entry?.[0];
   const changes = entry?.changes?.[0];
@@ -402,16 +409,19 @@ app.post('/to_cliq', async (req, res) => {
         }
       });
 
-      res.set('Content-Type', 'image/jpeg');
-      res.send(imageRes.data);
+      const filename = `${uuidv4()}.jpg`;
+      const filepath = path.join(__dirname, 'public', 'images', filename);
+
+      fs.writeFileSync(filepath, imageBuffer.data);
+      const publicImageUrl = `https://test-aws-lz6a.onrender.com/images/${filename}`;
 
       response = await axios.post(
         'https://cliq.zoho.in/api/v2/bots/test/message',
         {
-          text: `📷 WhatsApp image from ${from}: [Click to view](${imageRes.data})`,
+          text: `WhatsApp image from ${from}: [Click to view image](${publicImageUrl})`,
           userids: matchedUser.user_id,
           sync_message: true
-        },  
+        },
         {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
