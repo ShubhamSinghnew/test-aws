@@ -415,6 +415,8 @@ app.post('/to_cliq', async (req, res) => {
       const filepath = path.join(__dirname, 'public', 'images', filename);
       console.log('filepath: ', filepath)
 
+      fs.mkdirSync(path.join(__dirname, 'public', 'images'), { recursive: true });
+
       fs.writeFileSync(filepath, imageRes.data);
       const publicImageUrl = `https://test-aws-lz6a.onrender.com/images/${filename}`;
       console.log('publicImageUrl: ', publicImageUrl)
