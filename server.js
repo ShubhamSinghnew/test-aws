@@ -256,8 +256,13 @@ app.post('/from-cliq', async (req, res) => {
 
     if (req.body?.file?.file?.url) {
       const imageUrl = req.body.file.file.url;
-      const comment = req.body.file.comment; // Optional comment added with image
+      console.log('imageUrl: ', imageUrl)
+      console.log(req.body.file)
+      const commentText = req.body.file.comment && req.body.file.comment.trim() !== ""
+        ? req.body.file.comment
+        : " ";  // Use a space to satisfy the required variable
 
+      console.log(commentText)
       template = "whatsapp_test"; // Template with image header + 1 body variable
 
       components.push({
@@ -275,7 +280,7 @@ app.post('/from-cliq', async (req, res) => {
         parameters: [
           {
             type: "text",
-            text: comment || " "  // Required body variable — fallback to space if empty
+            text: commentText  // Required body variable — fallback to space if empty
           }
         ]
       });
@@ -292,7 +297,6 @@ app.post('/from-cliq', async (req, res) => {
         ]
       });
     }
-
 
     const payload = {
       messaging_product: "whatsapp",
@@ -400,7 +404,7 @@ app.post('/to_cliq', async (req, res) => {
         }
       });
       const mediaUrl = mediaUrlResponse.data.url;
-   
+
       const imageRes = await axios.get(mediaUrl, {
         responseType: 'arraybuffer',
         headers: {
@@ -410,7 +414,7 @@ app.post('/to_cliq', async (req, res) => {
 
       const filename = `${uuidv4()}.jpg`;
       const filepath = path.join(__dirname, 'public', 'images', filename);
-      
+
       fs.mkdirSync(path.join(__dirname, 'public', 'images'), { recursive: true });
 
       fs.writeFileSync(filepath, imageRes.data);
@@ -419,7 +423,7 @@ app.post('/to_cliq', async (req, res) => {
       response = await axios.post(
         'https://cliq.zoho.in/api/v2/bots/test/message',
         {
-          text: `WhatsApp image from ${from}: [Click to view image](${publicImageUrl}) ${msg?.image?.caption}`,
+          text: `WhatsApp image from ${from}: [Click to view image](${publicImageUrl}) ${msg?.image?.caption === undefined ? "" : msg?.image?.caption}`,
           userids: matchedUser.user_id,
           sync_message: true
         },
