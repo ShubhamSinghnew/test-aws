@@ -21,7 +21,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Configure CORS
 app.use(cors({ origin: true }))
 
-
 // Start server
 const port = process.env.PORT || 5000;
 app.listen(port, () => {
