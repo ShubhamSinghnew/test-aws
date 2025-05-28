@@ -412,7 +412,7 @@ app.post('/to_cliq', async (req, res) => {
       const filename = `${uuidv4()}.jpg`;
       const filepath = path.join(__dirname, 'public', 'images', filename);
 
-      fs.writeFileSync(filepath, imageBuffer.data);
+      fs.writeFileSync(filepath, imageRes.data);
       const publicImageUrl = `https://test-aws-lz6a.onrender.com/images/${filename}`;
 
       response = await axios.post(
