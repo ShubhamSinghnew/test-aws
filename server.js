@@ -278,7 +278,6 @@ app.post('/from-cliq', async (req, res) => {
 
     } else if (messageText) {
       template = "whatsapp_txt"; // Template with only body text
-
       components.push({
         type: "body",
         parameters: [
@@ -288,9 +287,6 @@ app.post('/from-cliq', async (req, res) => {
           }
         ]
       });
-
-    } else {
-      return res.status(400).send("No valid message or media to send.");
     }
 
 
@@ -320,6 +316,7 @@ app.post('/from-cliq', async (req, res) => {
     res.status(200).send('Message forwarded to WhatsApp.');
 
   } catch (error) {
+    console.log('error: ', error)
     console.error('Error sending WhatsApp message:', error.response?.data || error.message);
     res.status(500).send('Failed to send message.');
   }
@@ -347,7 +344,7 @@ app.post('/to_cliq', async (req, res) => {
   }
 
   const msg = messages[0];
-  const text = msg.text?.body;
+  const type = msg?.type
   const from = msg.from;
 
   // Read user.json
@@ -363,20 +360,39 @@ app.post('/to_cliq', async (req, res) => {
   try {
     const accessToken = await getZohoAccessToken();
 
-    const response = await axios.post(
-      'https://cliq.zoho.in/api/v2/bots/test/message',
-      {
-        text: `WhatsApp message from ${from}: ${text}`,
-        userids: matchedUser.user_id,
-        sync_message: true
-      },
-      {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
+    let response
+
+    if (type === "text") {
+      response = await axios.post(
+        'https://cliq.zoho.in/api/v2/bots/test/message',
+        {
+          text: `WhatsApp message from ${from}: ${msg?.text?.body}`,
+          userids: matchedUser.user_id,
+          sync_message: true
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          }
         }
-      }
-    );
+      );
+    } else {
+      response = await axios.post(
+        'https://cliq.zoho.in/api/v2/bots/test/message',
+        {
+          text: `WhatsApp message from ${from}: ${msg?.image?.id}`,
+          userids: matchedUser.user_id,
+          sync_message: true
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+    }
 
     res.status(200).json({
       message: 'Message sent to Zoho Cliq',
