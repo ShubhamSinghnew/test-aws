@@ -400,6 +400,7 @@ app.post('/to_cliq', async (req, res) => {
         }
       });
       const mediaUrl = mediaUrlResponse.data.url;
+      console.log('mediaUrl: ', mediaUrl)
 
       const imageRes = await axios.get(mediaUrl, {
         responseType: 'arraybuffer',
@@ -408,11 +409,15 @@ app.post('/to_cliq', async (req, res) => {
         }
       });
 
+      console.log(imageRes.data)
+
       const filename = `${uuidv4()}.jpg`;
       const filepath = path.join(__dirname, 'public', 'images', filename);
+      console.log('filepath: ', filepath)
 
       fs.writeFileSync(filepath, imageRes.data);
       const publicImageUrl = `https://test-aws-lz6a.onrender.com/images/${filename}`;
+      console.log('publicImageUrl: ', publicImageUrl)
 
       response = await axios.post(
         'https://cliq.zoho.in/api/v2/bots/test/message',
