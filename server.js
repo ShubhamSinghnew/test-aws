@@ -393,31 +393,25 @@ app.post('/to_cliq', async (req, res) => {
           Authorization: `Bearer ${whatsappAccessToken}`
         }
       });
-
-      console.log("mediaUrlResponse", mediaUrlResponse)
-
-      console.log("mediaUrlResponse.data.url", mediaUrlResponse.data.url)
-
       const mediaUrl = mediaUrlResponse.data.url;
-      console.log('mediaUrl: ', mediaUrl)
 
-      // // 2. Download the image from the media URL
-      // const imageBuffer = await axios.get(mediaUrl, {
-      //   responseType: 'arraybuffer',
-      //   headers: {
-      //     Authorization: `Bearer ${whatsappAccessToken}`
-      //   }
-      // });
-      // TEMP: use WhatsApp URL (expires in 5 minutes)
-      const imageLink = mediaUrl;
-      console.log('imageLink: ', imageLink)
+      const imageRes = await axios.get(mediaUrl, {
+        responseType: 'arraybuffer',
+        headers: {
+          Authorization: `Bearer ${whatsappAccessToken}`
+        }
+      });
+
+      res.set('Content-Type', 'image/jpeg');
+      res.send(imageRes.data);
+
       response = await axios.post(
         'https://cliq.zoho.in/api/v2/bots/test/message',
         {
-          text: `WhatsApp message from ${from}: ${imageLink}`,
+          text: `📷 WhatsApp image from ${from}: [Click to view](${imageRes.data})`,
           userids: matchedUser.user_id,
           sync_message: true
-        },
+        },  
         {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
