@@ -378,10 +378,43 @@ app.post('/to_cliq', async (req, res) => {
         }
       );
     } else {
+
+      const whatsappTokenData = JSON.parse(fs.readFileSync("whatsapp_token.json", "utf-8"));
+      const now = Date.now();
+
+      if (now > whatsappTokenData.expires_at) {
+        return res.status(401).send("WhatsApp access token expired. Please update it.");
+      }
+
+      const whatsappAccessToken = whatsappTokenData.access_token;
+
+      const mediaUrlResponse = await axios.get(`https://graph.facebook.com/v19.0/${msg?.image?.id}`, {
+        headers: {
+          Authorization: `Bearer ${whatsappAccessToken}`
+        }
+      });
+
+      console.log("mediaUrlResponse", mediaUrlResponse)
+
+      console.log("mediaUrlResponse.data.url", mediaUrlResponse.data.url)
+
+      const mediaUrl = mediaUrlResponse.data.url;
+      console.log('mediaUrl: ', mediaUrl)
+
+      // // 2. Download the image from the media URL
+      // const imageBuffer = await axios.get(mediaUrl, {
+      //   responseType: 'arraybuffer',
+      //   headers: {
+      //     Authorization: `Bearer ${whatsappAccessToken}`
+      //   }
+      // });
+      // TEMP: use WhatsApp URL (expires in 5 minutes)
+      const imageLink = mediaUrl;
+      console.log('imageLink: ', imageLink)
       response = await axios.post(
         'https://cliq.zoho.in/api/v2/bots/test/message',
         {
-          text: `WhatsApp message from ${from}: ${msg?.image?.id}`,
+          text: `WhatsApp message from ${from}: ${imageLink}`,
           userids: matchedUser.user_id,
           sync_message: true
         },
