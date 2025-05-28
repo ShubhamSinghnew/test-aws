@@ -1,0 +1,8 @@
+{
+  "access_token": "1000.4b0111358e086a99557da50ffd7dc7a1.b73bf98669dbe4f957d3f88dadefc854",
+  "refresh_token": "1000.f3a08f41bb37668e0908a20aad79af01.db8e5c520d574b7be83d3b31c44e076b",
+  "expires_at": 1747730716638,
+  "scope": "ZohoCliq.Channels.CREATE ZohoCliq.Channels.READ ZohoCliq.Channels.UPDATE ZohoCliq.Channels.DELETE ZohoCliq.Chats.READ ZohoCliq.Messages.READ ZohoCliq.Users.READ ZohoCliq.Webhooks.CREATE",
+  "api_domain": "https://www.zohoapis.in",
+  "token_type": "Bearer"
+}
