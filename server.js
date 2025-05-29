@@ -176,7 +176,7 @@ app.post('/from-cliq', async (req, res) => {
     //   });
     // }
 
-    if (req.body?.url) {
+    if (req.body?.url && req.body?.type === "image/png") {
       const imageUrl = req.body.url;
       console.log("with comment ttttttttttttttttttttttt",imageUrl)
       languageCode = "en_US";
@@ -210,6 +210,53 @@ app.post('/from-cliq', async (req, res) => {
 
     } else if (messageText && messageText.length !== 0) {
       console.log("only text",messageText)
+      languageCode = "en";
+      template = "whatsapp_txt"; // Template with only body text
+      components.push({
+        type: "body",
+        parameters: [
+          {
+            type: "text",
+            text: messageText
+          }
+        ]
+      });
+    }
+
+
+    if (req.body?.url && req.body?.type === "application/pdf") {
+      const imageUrl = req.body.url;
+      languageCode = "en_US";
+      const commentText = req.body?.comment && req.body?.comment !== ""
+        ? req.body?.comment
+        : "default_txt";  // Use a space to satisfy the required variable
+
+      template = "whatsapp_file_text"; // Template with image header + 1 body variable
+
+      components.push({
+        type: "header",
+        parameters: [
+          {
+            type: "document",
+            document: {
+              link: imageUrl,           // ✅ Publicly accessible document URL
+            }
+          }
+        ]
+      });
+
+
+      components.push({
+        type: "body",
+        parameters: [
+          {
+            type: "text",
+            text: commentText // Required body variable — fallback to space if empty
+          }
+        ]
+      });
+
+    } else if (messageText && messageText.length !== 0) {
       languageCode = "en";
       template = "whatsapp_txt"; // Template with only body text
       components.push({
