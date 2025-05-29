@@ -147,8 +147,11 @@ app.post('/from-cliq', async (req, res) => {
     let template = "whatsapp_txt";  // Always use the image+text template
     const components = [];
 
+    let languageCode = "en"; // default
+
     if (req.body?.file?.file?.url) {
       const imageUrl = req.body.file.file.url;
+      languageCode = "en_US";
       console.log('imageUrl: ', imageUrl)
       const commentText = req.body.file.comment && req.body.file.comment.trim() !== ""
         ? req.body.file.comment
@@ -179,6 +182,7 @@ app.post('/from-cliq', async (req, res) => {
       });
 
     } else if (messageText) {
+      languageCode = "en";
       template = "whatsapp_txt"; // Template with only body text
       components.push({
         type: "body",
@@ -197,7 +201,7 @@ app.post('/from-cliq', async (req, res) => {
       type: "template",
       template: {
         name: template,
-        language: { code: "en_US" },
+        language: { code: languageCode },
         components
       }
     };
