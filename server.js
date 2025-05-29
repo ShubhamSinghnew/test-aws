@@ -149,7 +149,7 @@ app.post('/from-cliq', async (req, res) => {
 
     let languageCode = "en"; // default
 
-    if (req.body?.url && (req.body?.type === "image/png" || req.body?.type === "image/jpeg")) {
+    if (req.body?.url && (req.body?.type?.split("/")[0] === "image")) {
       const imageUrl = req.body.url;
       languageCode = "en_US";
       const commentText = req.body?.comment && req.body?.comment !== ""
