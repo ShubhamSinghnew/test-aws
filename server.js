@@ -174,7 +174,7 @@ app.post('/from-cliq', async (req, res) => {
         parameters: [
           {
             type: "text",
-            text: commentText || "default_txt"  // Required body variable — fallback to space if empty
+            text: commentText // Required body variable — fallback to space if empty
           }
         ]
       });
@@ -192,7 +192,6 @@ app.post('/from-cliq', async (req, res) => {
         ]
       });
     }
-
 
     const payload = {
       messaging_product: "whatsapp",
