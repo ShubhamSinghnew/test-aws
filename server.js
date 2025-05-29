@@ -151,8 +151,6 @@ app.post('/from-cliq', async (req, res) => {
 
     if (req.body?.url) {
       const imageUrl = req.body.url;
-      console.log('imageUrl: ', imageUrl)
-      console.log("comment", req.body?.file)
       languageCode = "en_US";
       const commentText = req.body?.file && req.body?.file !== ""
         ? req.body?.file
@@ -160,6 +158,7 @@ app.post('/from-cliq', async (req, res) => {
 
       template = "whatsapp_test"; // Template with image header + 1 body variable
 
+      console.log(commentText)
       components.push({
         type: "header",
         parameters: [
@@ -175,7 +174,7 @@ app.post('/from-cliq', async (req, res) => {
         parameters: [
           {
             type: "text",
-            text: commentText  // Required body variable — fallback to space if empty
+            text: commentText || "default_txt"  // Required body variable — fallback to space if empty
           }
         ]
       });
@@ -193,6 +192,7 @@ app.post('/from-cliq', async (req, res) => {
         ]
       });
     }
+
 
     const payload = {
       messaging_product: "whatsapp",
