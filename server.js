@@ -180,8 +180,8 @@ app.post('/from-cliq', async (req, res) => {
       const imageUrl = req.body.url;
       console.log("with comment ttttttttttttttttttttttt",imageUrl)
       languageCode = "en_US";
-      const commentText = req.body?.file && req.body?.file !== ""
-        ? req.body?.file
+      const commentText = req.body?.comment && req.body?.comment !== ""
+        ? req.body?.comment
         : "default_txt";  // Use a space to satisfy the required variable
 
       template = "whatsapes_test__from_rro"; // Template with image header + 1 body variable
