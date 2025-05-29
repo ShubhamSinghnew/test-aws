@@ -153,9 +153,9 @@ app.post('/from-cliq', async (req, res) => {
       const imageUrl = req.body.file.file.url;
       languageCode = "en_US";
       console.log('imageUrl: ', req.body.file,imageUrl)
-      const commentText = req.body.file.comment && req.body.file.comment.trim() !== ""
-        ? req.body.file.comment
-        : " ";  // Use a space to satisfy the required variable
+      const commentText = req.body.comment && req.body.comment.trim() !== ""
+        ? req.body.comment
+        : "default_txt";  // Use a space to satisfy the required variable
 
       console.log(commentText)
 
