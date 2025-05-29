@@ -123,6 +123,7 @@ async function downloadFile(url, outputPath) {
 
 app.post('/from-cliq', async (req, res) => {
   try {
+    console.log(req.body)
     const check_receiver = req.body.user;
     const messageText = req.body.message;
 
