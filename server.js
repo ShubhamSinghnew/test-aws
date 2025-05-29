@@ -184,6 +184,8 @@ app.post('/from-cliq', async (req, res) => {
         ? req.body?.comment
         : "default_txt";  // Use a space to satisfy the required variable
 
+      console.log(commentText)
+
       template = "whatsapes_test__from_rro"; // Template with image header + 1 body variable
 
       components.push({
