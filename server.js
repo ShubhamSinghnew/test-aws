@@ -245,6 +245,16 @@ app.post('/from-cliq', async (req, res) => {
       });
     }
 
+    components.push({
+        type: "body",
+        parameters: [
+          {
+            type: "text",
+            text: messageText
+          }
+        ]
+      });
+
     const payload = {
       messaging_product: "whatsapp",
       to: matchedUser.recipient_no,
