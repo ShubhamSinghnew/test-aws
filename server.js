@@ -7,6 +7,8 @@ import qs from "qs"
 import twilio from "twilio";
 import fs from "fs"
 import path from "path"
+import sharp from "sharp";
+import https from "https"
 import { v4 as uuidv4 } from 'uuid';
 import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
@@ -98,8 +100,6 @@ app.get('/auth/zoho/callback', async (req, res) => {
 
     console.log('Access Token:', response.data);
 
-
-
     res.send('Zoho authorization complete. Tokens received.');
   } catch (err) {
     console.error('Error:', err.response?.data || err.message);
@@ -107,126 +107,21 @@ app.get('/auth/zoho/callback', async (req, res) => {
   }
 });
 
-// app.post('/from-cliq', async (req, res) => {
-//   try {
-//     const check_receiver = req.body.user;
-//     const messageText = req.body.message;
-//     let template = ""
 
+async function downloadFile(url, outputPath) {
+  const response = await axios.get(url, {
+    responseType: 'stream',
+    headers: {
+      Authorization: 'Ber', // or any valid header
+    },
+  });
+  response.data.pipe(fs.createWriteStream(outputPath));
+  return new Promise((resolve, reject) => {
+    response.data.on('end', () => resolve(outputPath));
+    response.data.on('error', reject);
+  });
+}
 
-
-//     // Read user.json
-//     const find_user = JSON.parse(fs.readFileSync("user.json", { encoding: 'utf-8' }));
-
-//     // Find matching user data
-//     const matchedUser = find_user.find(ele => ele.user_id !== null && ele.user_id === check_receiver);
-
-//     if (!matchedUser) {
-//       return res.status(404).send('User not found');
-//     }
-
-//     // Prepare WhatsApp API call parameters
-//     const whatsappTokenData = JSON.parse(fs.readFileSync("whatsapp_token.json", "utf-8"));
-//     const now = Date.now();
-
-//     if (now > whatsappTokenData.expires_at) {
-//       return res.status(401).send("WhatsApp access token expired. Please update it.");
-//     }
-
-//     const whatsappAccessToken = whatsappTokenData.access_token;
-//     const phoneNumberId = '578737805333309';
-
-//     // Prepare payload for WhatsApp Cloud API (template message example)
-//     // const payload = {
-//     //   messaging_product: "whatsapp",
-//     //   to: matchedUser.recipient_no,
-//     //   type: "template",
-//     //   template: {
-//     //     name: "whatsapp_test", // Must match your media-template name
-//     //     language: {
-//     //       code: "en"
-//     //     },
-//     //     components: [
-//     //       {
-//     //         type: "header", // Media header
-//     //         parameters: [
-//     //           {
-//     //             type: "image",
-//     //             image: {
-//     //               link: file // Publicly accessible image URL
-//     //             }
-//     //           }
-//     //         ]
-//     //       },
-//     //       {
-//     //         type: "body",
-//     //         parameters: [
-//     //           {
-//     //             type: "text",
-//     //             text: messageText
-//     //           }
-//     //         ]
-//     //       }
-//     //     ]
-//     //   }
-//     // };
-
-//     const components = [];
-
-//     if (req.body?.file?.file?.url) {
-//         template = "whatsapp_test"
-//         components.push({
-//           type: "header",
-//           parameters: [{
-//             type: "image",
-//             image: { link: req.body.file.file.url }
-//           }]
-//         });
-//     }
-
-//     if (messageText) {
-//       template = "whatsapp_txt"
-//       components.push({
-//         type: "body",
-//         parameters: [{
-//           type: "text",
-//           text: messageText
-//         }]
-//       });
-//     }
-
-//     const payload = {
-//       messaging_product: "whatsapp",
-//       to: matchedUser.recipient_no,
-//       type: "template",
-//       template: {
-//         name: template,
-//         language: { code: "en" },
-//         components
-//       }
-//     };
-
-//     // Call WhatsApp Cloud API to send message
-//     const response = await axios.post(
-//       `https://graph.facebook.com/v22.0/${phoneNumberId}/messages`,
-//       payload,
-//       {
-//         headers: {
-//           Authorization: `Bearer ${whatsappAccessToken}`,
-//           'Content-Type': 'application/json'
-//         }
-//       }
-//     );
-
-//     console.log('WhatsApp message sent:', response.data);
-
-//     res.status(200).send('Message forwarded to WhatsApp.');
-
-//   } catch (error) {
-//     console.error('Error sending WhatsApp message:', error.response?.data || error.message);
-//     res.status(500).send('Failed to send message.');
-//   }
-// });
 
 app.post('/from-cliq', async (req, res) => {
   try {
@@ -256,12 +151,12 @@ app.post('/from-cliq', async (req, res) => {
 
     if (req.body?.file?.file?.url) {
       const imageUrl = req.body.file.file.url;
-      console.log('testing', req.body.file)
+      console.log('imageUrl: ', imageUrl)
       const commentText = req.body.file.comment && req.body.file.comment.trim() !== ""
         ? req.body.file.comment
         : " ";  // Use a space to satisfy the required variable
 
-      console.log(commentText);
+      console.log(commentText)
 
       template = "whatsapp_test"; // Template with image header + 1 body variable
 
@@ -304,7 +199,7 @@ app.post('/from-cliq', async (req, res) => {
       type: "template",
       template: {
         name: template,
-        language: { code: "en" },
+        language: { code: "en_US" },
         components
       }
     };
@@ -324,7 +219,6 @@ app.post('/from-cliq', async (req, res) => {
     res.status(200).send('Message forwarded to WhatsApp.');
 
   } catch (error) {
-    console.log('error: ', error)
     console.error('Error sending WhatsApp message:', error.response?.data || error.message);
     res.status(500).send('Failed to send message.');
   }
