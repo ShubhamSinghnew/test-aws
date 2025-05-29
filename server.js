@@ -123,7 +123,6 @@ async function downloadFile(url, outputPath) {
 
 app.post('/from-cliq', async (req, res) => {
   try {
-    console.log(req.body)
     const check_receiver = req.body.user;
     const messageText = req.body.message;
 
@@ -150,6 +149,32 @@ app.post('/from-cliq', async (req, res) => {
 
     let languageCode = "en"; // default
 
+    if (req.body && req.body?.file && req.body?.file?.file) {
+      const imageUrl = req.body?.file?.file?.url;
+      languageCode = "en_US";
+      template = "whatsapes_test__from_rro"; // Template with image header + 1 body variable
+
+      components.push({
+        type: "header",
+        parameters: [
+          {
+            type: "image",
+            image: { link: imageUrl }
+          }
+        ]
+      });
+
+      components.push({
+        type: "body",
+        parameters: [
+          {
+            type: "text",
+            text: "default_txt" // Required body variable — fallback to space if empty
+          }
+        ]
+      });
+    }
+
     if (req.body?.url) {
       const imageUrl = req.body.url;
       languageCode = "en_US";
@@ -157,9 +182,8 @@ app.post('/from-cliq', async (req, res) => {
         ? req.body?.file
         : "default_txt";  // Use a space to satisfy the required variable
 
-      template = "whatsapp_test"; // Template with image header + 1 body variable
+      template = "whatsapes_test__from_rro"; // Template with image header + 1 body variable
 
-      console.log(commentText)
       components.push({
         type: "header",
         parameters: [
@@ -180,7 +204,7 @@ app.post('/from-cliq', async (req, res) => {
         ]
       });
 
-    } else if (messageText) {
+    } else if (messageText && messageText.length !== 0) {
       languageCode = "en";
       template = "whatsapp_txt"; // Template with only body text
       components.push({
