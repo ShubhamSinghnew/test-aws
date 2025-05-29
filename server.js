@@ -149,33 +149,6 @@ app.post('/from-cliq', async (req, res) => {
 
     let languageCode = "en"; // default
 
-    // if (req.body && req.body?.file && req.body?.file?.file) {
-    //   console.log("testing in the without comment if",req.body?.file?.file?.url)
-    //   const imageUrl = req.body?.file?.file?.url;
-    //   languageCode = "en_US";
-    //   template = "whatsapes_test__from_rro"; // Template with image header + 1 body variable
-
-    //   components.push({
-    //     type: "header",
-    //     parameters: [
-    //       {
-    //         type: "image",
-    //         image: { link: imageUrl }
-    //       }
-    //     ]
-    //   });
-
-    //   components.push({
-    //     type: "body",
-    //     parameters: [
-    //       {
-    //         type: "text",
-    //         text: "default_txt" // Required body variable — fallback to space if empty
-    //       }
-    //     ]
-    //   });
-    // }
-
     if (req.body?.url && req.body?.type === "image/png") {
       const imageUrl = req.body.url;
       console.log("with comment ttttttttttttttttttttttt",imageUrl)
@@ -226,10 +199,12 @@ app.post('/from-cliq', async (req, res) => {
 
     if (req.body?.url && req.body?.type === "application/pdf") {
       const imageUrl = req.body.url;
+      console.log(imageUrl)
       languageCode = "en_US";
       const commentText = req.body?.comment && req.body?.comment !== ""
         ? req.body?.comment
         : "default_txt";  // Use a space to satisfy the required variable
+      console.log("commentText",commentText)
 
       template = "whatsapp_file_text"; // Template with image header + 1 body variable
 
