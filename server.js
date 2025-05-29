@@ -151,13 +151,12 @@ app.post('/from-cliq', async (req, res) => {
 
     if (req.body?.file?.file?.url) {
       const imageUrl = req.body.file.file.url;
+      console.log('req.body.file.file: ', req.body.file.file)
+      console.log('req.body.file: ', req.body.file)
       languageCode = "en_US";
-      console.log('imageUrl: ', req.body.file,imageUrl)
       const commentText = req.body.comment && req.body.comment.trim() !== ""
         ? req.body.comment
         : "default_txt";  // Use a space to satisfy the required variable
-
-      console.log(commentText)
 
       template = "whatsapp_test"; // Template with image header + 1 body variable
 
