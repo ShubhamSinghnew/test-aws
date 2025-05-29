@@ -150,7 +150,7 @@ app.post('/from-cliq', async (req, res) => {
     let languageCode = "en"; // default
 
     if (req.body && req.body?.file && req.body?.file?.file) {
-      console.log(req.body?.file?.file?.url)
+      console.log("testing in the without comment if",req.body?.file?.file?.url)
       const imageUrl = req.body?.file?.file?.url;
       languageCode = "en_US";
       template = "whatsapes_test__from_rro"; // Template with image header + 1 body variable
@@ -178,7 +178,7 @@ app.post('/from-cliq', async (req, res) => {
 
     if (req.body?.url) {
       const imageUrl = req.body.url;
-      console.log(imageUrl)
+      console.log("with comment ttttttttttttttttttttttt",imageUrl)
       languageCode = "en_US";
       const commentText = req.body?.file && req.body?.file !== ""
         ? req.body?.file
@@ -207,7 +207,7 @@ app.post('/from-cliq', async (req, res) => {
       });
 
     } else if (messageText && messageText.length !== 0) {
-      console.log(messageText)
+      console.log("only text",messageText)
       languageCode = "en";
       template = "whatsapp_txt"; // Template with only body text
       components.push({
