@@ -261,6 +261,8 @@ app.post('/from-cliq', async (req, res) => {
         ? req.body.file.comment
         : " ";  // Use a space to satisfy the required variable
 
+      console.log(commentText);
+
       template = "whatsapp_test"; // Template with image header + 1 body variable
 
       components.push({
