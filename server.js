@@ -151,13 +151,10 @@ app.post('/from-cliq', async (req, res) => {
 
     if (req.body?.url && req.body?.type === "image/png") {
       const imageUrl = req.body.url;
-      console.log("with comment ttttttttttttttttttttttt",imageUrl)
       languageCode = "en_US";
       const commentText = req.body?.comment && req.body?.comment !== ""
         ? req.body?.comment
         : "default_txt";  // Use a space to satisfy the required variable
-
-      console.log(commentText)
 
       template = "whatsapes_test__from_rro"; // Template with image header + 1 body variable
 
@@ -180,31 +177,12 @@ app.post('/from-cliq', async (req, res) => {
           }
         ]
       });
-
-    } else if (messageText && messageText.length !== 0) {
-      console.log("only text",messageText)
-      languageCode = "en";
-      template = "whatsapp_txt"; // Template with only body text
-      components.push({
-        type: "body",
-        parameters: [
-          {
-            type: "text",
-            text: messageText
-          }
-        ]
-      });
-    }
-
-
-    if (req.body?.url && req.body?.type === "application/pdf") {
+    }else if (req.body?.url && req.body?.type === "application/pdf") {
       const imageUrl = req.body.url;
-      console.log(imageUrl)
       languageCode = "en_US";
       const commentText = req.body?.comment && req.body?.comment !== ""
         ? req.body?.comment
         : "default_txt";  // Use a space to satisfy the required variable
-      console.log("commentText",commentText)
 
       template = "whatsapp_file_text"; // Template with image header + 1 body variable
 
@@ -219,8 +197,6 @@ app.post('/from-cliq', async (req, res) => {
           }
         ]
       });
-
-
       components.push({
         type: "body",
         parameters: [
@@ -231,7 +207,8 @@ app.post('/from-cliq', async (req, res) => {
         ]
       });
 
-    } else if (messageText && messageText.length !== 0) {
+    } else if (messageText && messageText.length !== 0 && req.body?.type === "text") {
+      console.log("kllllll")
       languageCode = "en";
       template = "whatsapp_txt"; // Template with only body text
       components.push({
@@ -244,16 +221,6 @@ app.post('/from-cliq', async (req, res) => {
         ]
       });
     }
-
-    components.push({
-        type: "body",
-        parameters: [
-          {
-            type: "text",
-            text: messageText
-          }
-        ]
-      });
 
     const payload = {
       messaging_product: "whatsapp",
