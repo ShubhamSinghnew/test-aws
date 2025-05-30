@@ -208,7 +208,7 @@ app.post('/from-cliq', async (req, res) => {
           {
             type: "video",
             video: {
-              link: imageUrl  
+              link: imageUrl
             }
           }
         ]
@@ -282,6 +282,7 @@ app.get('/to_cliq', (req, res) => {
 });
 
 app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
+app.use('/videos', express.static(path.join(__dirname, 'public', 'videos')));
 
 app.post('/to_cliq', async (req, res) => {
   const entry = req.body.entry?.[0];
@@ -326,7 +327,9 @@ app.post('/to_cliq', async (req, res) => {
           }
         }
       );
-    } else {
+    }
+
+    if (type === "image") {
       const whatsappTokenData = JSON.parse(fs.readFileSync("whatsapp_token.json", "utf-8"));
       const now = Date.now();
 
@@ -374,7 +377,9 @@ app.post('/to_cliq', async (req, res) => {
       );
     }
 
+
     if (type === "video") {
+      console.log(req.body)
       const whatsappTokenData = JSON.parse(fs.readFileSync("whatsapp_token.json", "utf-8"));
       const now = Date.now();
 
@@ -428,6 +433,7 @@ app.post('/to_cliq', async (req, res) => {
         }
       );
     }
+
 
 
     res.status(200).json({
