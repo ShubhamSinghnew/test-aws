@@ -139,10 +139,12 @@ app.post('/from-cliq', async (req, res) => {
       const imageUrl = req.body.url;
       languageCode = "en_US";
       const commentText = req.body?.comment && req.body?.comment !== ""
-        ? req.body?.comment
-        : "default_txt";  // Use a space to satisfy the required variable
+        ? req.body?.first_name + " " + req.body?.last_name + "    " + req.body?.comment
+        : req.body?.first_name + " " + req.body?.last_name;  // Use a space to satisfy the required variable
 
       template = "whatsapes_test__from_rro"; // Template with image header + 1 body variable
+
+      console.log(commentText)
 
       components.push({
         type: "header",
@@ -167,8 +169,8 @@ app.post('/from-cliq', async (req, res) => {
       const imageUrl = req.body.url;
       languageCode = "en_US";
       const commentText = req.body?.comment && req.body?.comment !== ""
-        ? req.body?.comment
-        : "default_txt";  // Use a space to satisfy the required variable
+        ? req.body?.first_name + " " + req.body?.last_name + "    " + req.body?.comment
+        : req.body?.first_name + " " + req.body?.last_name;  // Use a space to satisfy the required variable
 
       template = "whatsapp_file_text"; // Template with image header + 1 body variable
 
@@ -194,11 +196,11 @@ app.post('/from-cliq', async (req, res) => {
       })
     } else if (req.body?.url && req.body?.type?.split("/")[0] === "video") {
       const imageUrl = req.body.url;
-      console.log('imageUrl: ', imageUrl)
       languageCode = "en_US";
-      const commentText = req.body?.comment && req.body?.comment !== ""
-        ? req.body?.comment
-        : "default_txt";
+       const commentText = req.body?.comment && req.body?.comment !== ""
+        ? req.body?.first_name + " " + req.body?.last_name + "    " + req.body?.comment
+        : req.body?.first_name + " " + req.body?.last_name;  // Use a space to satisfy the required variable
+
 
       template = "whatsapp_video_and_text"; // Must be configured with video header + 1 body param
 
@@ -377,7 +379,6 @@ app.post('/to_cliq', async (req, res) => {
         }
       );
     }
-
 
     if (type === "video") {
       const whatsappTokenData = JSON.parse(fs.readFileSync("whatsapp_token.json", "utf-8"));
