@@ -413,7 +413,8 @@ app.post('/to_cliq', async (req, res) => {
         fs.mkdirSync(videosDir, { recursive: true });
       }
 
-      const filepath = path.join(__dirname, videosDir, filename);
+      const filepath = path.join(videosDir, filename);  // ✅ FIXED
+
 
       fs.writeFileSync(filepath, imageRes.data);
       const publicImageUrl = `https://test-aws-lz6a.onrender.com/videos/${filename}`;
