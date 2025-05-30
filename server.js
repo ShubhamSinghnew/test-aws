@@ -208,7 +208,7 @@ app.post('/from-cliq', async (req, res) => {
         type: "header",
         parameters: [
           {
-            type: "video",
+            type: "document",
             video: {
               link: imageUrl
             }
