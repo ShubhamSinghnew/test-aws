@@ -226,7 +226,6 @@ app.post('/from-cliq', async (req, res) => {
         ]
       });
     } else if (messageText && messageText.length !== 0 && req.body?.type === "text") {
-      console.log("text")
       languageCode = "en";
       template = "whatsapp_txt"; // Template with only body text
       components.push({
@@ -234,7 +233,7 @@ app.post('/from-cliq', async (req, res) => {
         parameters: [
           {
             type: "text",
-            text: messageText
+            text: req.body?.first_name + " " + req.body?.last_name +"    "+ messageText
           }
         ]
       });
@@ -319,7 +318,7 @@ app.post('/to_cliq', async (req, res) => {
       response = await axios.post(
         'https://cliq.zoho.in/api/v2/bots/test/message',
         {
-          text: `WhatsApp message from ${from}: ${msg?.text?.body}`,
+          text: `WhatsApp message from ${matchedUser.recipient_name}: ${msg?.text?.body}`,
           userids: matchedUser.user_id,
           sync_message: true
         },
