@@ -136,7 +136,6 @@ app.post('/from-cliq', async (req, res) => {
 
 
     if (req.body?.url && req.body?.type?.split("/")[0] === "image") {
-      console.log("images")
       const imageUrl = req.body.url;
       languageCode = "en_US";
       const commentText = req.body?.comment && req.body?.comment !== ""
@@ -149,10 +148,8 @@ app.post('/from-cliq', async (req, res) => {
         type: "header",
         parameters: [
           {
-            type: "document",
-            document: {
-              link: imageUrl
-            }
+            type: "image",
+            image: { link: imageUrl }
           }
         ]
       });
@@ -167,7 +164,6 @@ app.post('/from-cliq', async (req, res) => {
         ]
       });
     } else if (req.body?.url && req.body?.type?.split("/")[0] === "application") {
-      console.log("application")
       const imageUrl = req.body.url;
       languageCode = "en_US";
       const commentText = req.body?.comment && req.body?.comment !== ""
@@ -197,14 +193,14 @@ app.post('/from-cliq', async (req, res) => {
         ]
       })
     } else if (req.body?.url && req.body?.type?.split("/")[0] === "video") {
-      console.log("video")
       const imageUrl = req.body.url;
+      console.log('imageUrl: ', imageUrl)
       languageCode = "en_US";
       const commentText = req.body?.comment && req.body?.comment !== ""
         ? req.body?.comment
-        : "default_txt";  // Use a space to satisfy the required variable
+        : "default_txt";
 
-      template = "whatsapp_file_text"; // Template with image header + 1 body variable
+      template = "whatsapp_video_and_text"; // Must be configured with video header + 1 body param
 
       components.push({
         type: "header",
@@ -212,17 +208,18 @@ app.post('/from-cliq', async (req, res) => {
           {
             type: "video",
             video: {
-              link: imageUrl
+              link: imageUrl  
             }
           }
         ]
       });
+
       components.push({
         type: "body",
         parameters: [
           {
             type: "text",
-            text: commentText // Required body variable — fallback to space if empty
+            text: commentText
           }
         ]
       });
