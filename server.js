@@ -136,6 +136,7 @@ app.post('/from-cliq', async (req, res) => {
 
 
     if (req.body?.url && req.body?.type?.split("/")[0] === "image") {
+      console.log("images")
       const imageUrl = req.body.url;
       languageCode = "en_US";
       const commentText = req.body?.comment && req.body?.comment !== ""
@@ -164,6 +165,7 @@ app.post('/from-cliq', async (req, res) => {
         ]
       });
     } else if (req.body?.url && req.body?.type?.split("/")[0] === "application") {
+      console.log("application")
       const imageUrl = req.body.url;
       languageCode = "en_US";
       const commentText = req.body?.comment && req.body?.comment !== ""
@@ -193,6 +195,7 @@ app.post('/from-cliq', async (req, res) => {
         ]
       })
     } else if (req.body?.url && req.body?.type?.split("/")[0] === "video") {
+      console.log("video")
       const imageUrl = req.body.url;
       languageCode = "en_US";
       const commentText = req.body?.comment && req.body?.comment !== ""
@@ -222,7 +225,7 @@ app.post('/from-cliq', async (req, res) => {
         ]
       });
     } else if (messageText && messageText.length !== 0 && req.body?.type === "text") {
-      console.log("kllllll")
+      console.log("text")
       languageCode = "en";
       template = "whatsapp_txt"; // Template with only body text
       components.push({
