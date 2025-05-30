@@ -374,6 +374,62 @@ app.post('/to_cliq', async (req, res) => {
       );
     }
 
+    if (type === "video") {
+      const whatsappTokenData = JSON.parse(fs.readFileSync("whatsapp_token.json", "utf-8"));
+      const now = Date.now();
+
+      if (now > whatsappTokenData.expires_at) {
+        return res.status(401).send("WhatsApp access token expired. Please update it.");
+      }
+
+      const whatsappAccessToken = whatsappTokenData.access_token;
+
+      const mediaUrlResponse = await axios.get(`https://graph.facebook.com/v19.0/${msg?.video?.id}`, {
+        headers: {
+          Authorization: `Bearer ${whatsappAccessToken}`
+        }
+      });
+      const mediaUrl = mediaUrlResponse.data.url;
+
+      const imageRes = await axios.get(mediaUrl, {
+        responseType: 'arraybuffer',
+        headers: {
+          Authorization: `Bearer ${whatsappAccessToken}`
+        }
+      });
+
+
+      const mime = req.body?.type || "video/mp4"; // e.g., "video/mp4", "video/quicktime"
+      const extension = mime.split("/")[1];       // Get the extension part
+      const filename = `${uuidv4()}.${extension}`;
+
+      const videosDir = path.join(__dirname, 'public', 'videos');
+      if (!fs.existsSync(videosDir)) {
+        fs.mkdirSync(videosDir, { recursive: true });
+      }
+
+      const filepath = path.join(__dirname, videosDir, filename);
+
+      fs.writeFileSync(filepath, imageRes.data);
+      const publicImageUrl = `https://test-aws-lz6a.onrender.com/videos/${filename}`;
+
+      response = await axios.post(
+        'https://cliq.zoho.in/api/v2/bots/test/message',
+        {
+          text: `WhatsApp image from ${from}: [Click to view videos](${publicImageUrl}) ${msg?.video?.caption === undefined ? "" : msg?.video?.caption}`,
+          userids: matchedUser.user_id,
+          sync_message: true
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+    }
+
+
     res.status(200).json({
       message: 'Message sent to Zoho Cliq',
       data: response.data
