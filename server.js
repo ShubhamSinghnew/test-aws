@@ -106,21 +106,6 @@ app.get('/auth/zoho/callback', async (req, res) => {
 });
 
 
-async function downloadFile(url, outputPath) {
-  const response = await axios.get(url, {
-    responseType: 'stream',
-    headers: {
-      Authorization: 'Ber', // or any valid header
-    },
-  });
-  response.data.pipe(fs.createWriteStream(outputPath));
-  return new Promise((resolve, reject) => {
-    response.data.on('end', () => resolve(outputPath));
-    response.data.on('error', reject);
-  });
-}
-
-
 app.post('/from-cliq', async (req, res) => {
   try {
     const check_receiver = req.body.user;
@@ -149,7 +134,8 @@ app.post('/from-cliq', async (req, res) => {
 
     let languageCode = "en"; // default
 
-    if (req.body?.url && (req.body?.type?.split("/")[0] === "image")) {
+
+    if (req.body?.url && req.body?.type?.split("/")[0] === "image") {
       const imageUrl = req.body.url;
       languageCode = "en_US";
       const commentText = req.body?.comment && req.body?.comment !== ""
@@ -177,7 +163,7 @@ app.post('/from-cliq', async (req, res) => {
           }
         ]
       });
-    }else if (req.body?.url && req.body?.type === "application/pdf") {
+    } else if (req.body?.url && req.body?.type?.split("/")[0] === "application") {
       const imageUrl = req.body.url;
       languageCode = "en_US";
       const commentText = req.body?.comment && req.body?.comment !== ""
@@ -205,8 +191,36 @@ app.post('/from-cliq', async (req, res) => {
             text: commentText // Required body variable — fallback to space if empty
           }
         ]
-      });
+      })
+    } else if (req.body?.url && req.body?.type?.split("/")[0] === "video") {
+      const imageUrl = req.body.url;
+      languageCode = "en_US";
+      const commentText = req.body?.comment && req.body?.comment !== ""
+        ? req.body?.comment
+        : "default_txt";  // Use a space to satisfy the required variable
 
+      template = "whatsapp_file_text"; // Template with image header + 1 body variable
+
+      components.push({
+        type: "header",
+        parameters: [
+          {
+            type: "video",
+            video: {
+              link: imageUrl
+            }
+          }
+        ]
+      });
+      components.push({
+        type: "body",
+        parameters: [
+          {
+            type: "text",
+            text: commentText // Required body variable — fallback to space if empty
+          }
+        ]
+      });
     } else if (messageText && messageText.length !== 0 && req.body?.type === "text") {
       console.log("kllllll")
       languageCode = "en";
@@ -311,7 +325,6 @@ app.post('/to_cliq', async (req, res) => {
         }
       );
     } else {
-
       const whatsappTokenData = JSON.parse(fs.readFileSync("whatsapp_token.json", "utf-8"));
       const now = Date.now();
 
