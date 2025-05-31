@@ -139,12 +139,12 @@ app.post('/from-cliq', async (req, res) => {
       const imageUrl = req.body.url;
       languageCode = "en_US";
       const commentText = req.body?.comment && req.body?.comment !== ""
-        ? req.body?.first_name + " " + req.body?.last_name + "    " + req.body?.comment
-        : req.body?.first_name + " " + req.body?.last_name;  // Use a space to satisfy the required variable
+        ? req.body?.comment
+        : "*";  // Use a space to satisfy the required variable
 
       template = "whatsapes_test__from_rro"; // Template with image header + 1 body variable
 
-      console.log(commentText)
+      const fullName = `${req.body?.first_name ?? ""} ${req.body?.last_name ?? ""}`.trim();
 
       components.push({
         type: "header",
@@ -161,6 +161,10 @@ app.post('/from-cliq', async (req, res) => {
         parameters: [
           {
             type: "text",
+            text: fullName // Required body variable — fallback to space if empty
+          },
+          {
+            type: "text",
             text: commentText // Required body variable — fallback to space if empty
           }
         ]
@@ -169,10 +173,12 @@ app.post('/from-cliq', async (req, res) => {
       const imageUrl = req.body.url;
       languageCode = "en_US";
       const commentText = req.body?.comment && req.body?.comment !== ""
-        ? req.body?.first_name + " " + req.body?.last_name + "    " + req.body?.comment
-        : req.body?.first_name + " " + req.body?.last_name;  // Use a space to satisfy the required variable
+        ? req.body?.comment
+        : "*";  // Use a space to satisfy the required variable
 
       template = "whatsapp_file_text"; // Template with image header + 1 body variable
+
+      const fullName = `${req.body?.first_name ?? ""} ${req.body?.last_name ?? ""}`.trim();
 
       components.push({
         type: "header",
@@ -190,6 +196,10 @@ app.post('/from-cliq', async (req, res) => {
         parameters: [
           {
             type: "text",
+            text: fullName // Required body variable — fallback to space if empty
+          },
+          {
+            type: "text",
             text: commentText // Required body variable — fallback to space if empty
           }
         ]
@@ -197,10 +207,11 @@ app.post('/from-cliq', async (req, res) => {
     } else if (req.body?.url && req.body?.type?.split("/")[0] === "video") {
       const imageUrl = req.body.url;
       languageCode = "en_US";
-       const commentText = req.body?.comment && req.body?.comment !== ""
-        ? req.body?.first_name + " " + req.body?.last_name + "    " + req.body?.comment
-        : req.body?.first_name + " " + req.body?.last_name;  // Use a space to satisfy the required variable
+      const commentText = req.body?.comment && req.body?.comment !== ""
+        ? req.body?.comment
+        : "*";  // Use a space to satisfy the required variable
 
+      const fullName = `${req.body?.first_name ?? ""} ${req.body?.last_name ?? ""}`.trim();
 
       template = "whatsapp_video_and_text"; // Must be configured with video header + 1 body param
 
@@ -221,19 +232,29 @@ app.post('/from-cliq', async (req, res) => {
         parameters: [
           {
             type: "text",
+            text: fullName
+          },
+          {
+            type: "text",
             text: commentText
           }
         ]
       });
     } else if (messageText && messageText.length !== 0 && req.body?.type === "text") {
-      languageCode = "en";
-      template = "whatsapp_txt"; // Template with only body text
+      languageCode = "en_IN";
+      template = "whatsapp_text"; // Template with only body text
+      const fullName = `${req.body?.first_name ?? ""} ${req.body?.last_name ?? ""}`.trim();
+
       components.push({
         type: "body",
         parameters: [
           {
             type: "text",
-            text: req.body?.first_name + " " + req.body?.last_name +"    "+ messageText
+            text: fullName
+          },
+          {
+            type: "text",
+            text: messageText
           }
         ]
       });
@@ -315,10 +336,11 @@ app.post('/to_cliq', async (req, res) => {
     let response
 
     if (type === "text") {
+      const fullName = `${matchedUser?.recipient_name ?? ""}`.trim();
       response = await axios.post(
         'https://cliq.zoho.in/api/v2/bots/test/message',
         {
-          text: `WhatsApp message from ${matchedUser.recipient_name}: ${msg?.text?.body}`,
+          text: `Name: ${fullName}\nMessage: ${msg?.text?.body}`,
           userids: matchedUser.user_id,
           sync_message: true
         },
@@ -332,6 +354,7 @@ app.post('/to_cliq', async (req, res) => {
     }
 
     if (type === "image") {
+      const fullName = `${matchedUser?.recipient_name ?? ""}`.trim();
       const whatsappTokenData = JSON.parse(fs.readFileSync("whatsapp_token.json", "utf-8"));
       const now = Date.now();
 
@@ -366,7 +389,7 @@ app.post('/to_cliq', async (req, res) => {
       response = await axios.post(
         'https://cliq.zoho.in/api/v2/bots/test/message',
         {
-          text: `WhatsApp image from ${from}: [Click to view image](${publicImageUrl}) ${msg?.image?.caption === undefined ? "" : msg?.image?.caption}`,
+          text: `Name: ${fullName}\nMessage: [Click to view image](${publicImageUrl}) ${msg?.image?.caption === undefined ? "" : msg?.image?.caption}`,
           userids: matchedUser.user_id,
           sync_message: true
         },
@@ -380,6 +403,7 @@ app.post('/to_cliq', async (req, res) => {
     }
 
     if (type === "video") {
+      const fullName = `${matchedUser?.recipient_name ?? ""}`.trim();
       const whatsappTokenData = JSON.parse(fs.readFileSync("whatsapp_token.json", "utf-8"));
       const now = Date.now();
 
@@ -422,7 +446,7 @@ app.post('/to_cliq', async (req, res) => {
       response = await axios.post(
         'https://cliq.zoho.in/api/v2/bots/test/message',
         {
-          text: `WhatsApp video from ${from}: [Click to view videos](${publicImageUrl}) ${msg?.video?.caption === undefined ? "" : msg?.video?.caption}`,
+          text: `Name: ${fullName}\nMessage: [Click to view videos](${publicImageUrl}) ${msg?.video?.caption === undefined ? "" : msg?.video?.caption}`,
           userids: matchedUser.user_id,
           sync_message: true
         },
@@ -436,6 +460,7 @@ app.post('/to_cliq', async (req, res) => {
     }
 
     if (type === "document") {
+      const fullName = `${matchedUser?.recipient_name ?? ""}`.trim();
       const whatsappTokenData = JSON.parse(fs.readFileSync("whatsapp_token.json", "utf-8"));
       const now = Date.now();
 
@@ -478,7 +503,7 @@ app.post('/to_cliq', async (req, res) => {
       response = await axios.post(
         'https://cliq.zoho.in/api/v2/bots/test/message',
         {
-          text: `WhatsApp document from ${from}: [Click to view document](${publicImageUrl}) ${msg?.document?.caption === undefined ? "" : msg?.document?.caption}`,
+          text: `Name: ${fullName}\nMessage: [Click to view document](${publicImageUrl}) ${msg?.document?.caption === undefined ? "" : msg?.document?.caption}`,
           userids: matchedUser.user_id,
           sync_message: true
         },
