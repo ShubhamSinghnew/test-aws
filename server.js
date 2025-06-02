@@ -305,7 +305,7 @@ app.get('/to_cliq', (req, res) => {
 
 app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
 app.use('/videos', express.static(path.join(__dirname, 'public', 'videos')));
-app.use('/videos', express.static(path.join(__dirname, 'public', 'document')));
+app.use('/document', express.static(path.join(__dirname, 'public', 'document')));
 
 app.post('/to_cliq', async (req, res) => {
   const entry = req.body.entry?.[0];
